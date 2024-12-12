@@ -45,7 +45,7 @@ https://inloop.github.io/sqlite-viewer/
 
 In this use case the input data is in a csv file [2024-12-11_emerg_data_organized.csv].  The output is in SQLite .db files.  
 
-* [main.py](main.py) is used to convert the original data from Lincoln County into a dataset rationalized for this exercise -- it output [2024-12-11_emerg_data_organized.csv].
+* [main.py](main.py) is used to convert the original data from Lincoln County into a dataset rationalized for this exercise -- it output [2024-12-11_emerg_data_organized.csv](2024-12-11_emerg_data_organized.csv).
 
 * [csv-to-sqlite_using-sqlite3.py](csv-to-sqlite_using-sqlite3.py) is used to create [2024-12-11_emerg_data_organized_via_sqlite3.db].    
 
