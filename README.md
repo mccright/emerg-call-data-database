@@ -2,13 +2,12 @@
 
 Consolidate some of the Lincoln County emergency service response data into a simple database. 
 
-# Emergency Call Data SQL Database  
 
-## Starting with the "clean," munged data, transfer it into an SQL database  
+### Starting with the "clean," munged data, transfer it into an SQL database  
 Because it is available virtually everywhere with a minimum of fuss, I used [SQLite](https://sqlite.org/).  
 
 
-## Assembled for quick aggregation of Lincoln County, Nebraska Emergency Service Response Data  
+#### Assembled for quick aggregation of Lincoln County, Nebraska Emergency Service Response Data  
 
 The "clean," munged data has the layout below:  
 
@@ -52,7 +51,7 @@ In this use case the input data is in a csv file [2024-12-11_emerg_data_organize
 * [csv-to-sqlite_using-sqlalchemy.py](csv-to-sqlite_using-sqlalchemy.py) is used to create [2024-12-11_emerg_data_organized_via_sqlalchemy.db].  
 
 
-## My working notes...  
+### My working notes...  
 
 Normally response_unit is the name of a given team, dispatch_time is when they received a call for service and time_in_service is the amount of time a given response_unit spent on that given service.  
 
@@ -146,7 +145,7 @@ SELECT response_unit, count(response_unit) total_call_count, GROUP_CONCAT(time_i
 ```
 
 
-## Reference thoughts -- unfinished  
+### Reference thoughts -- unfinished  
 
 Table Definition (https://sqlite.org/datatype3.html)  
 Datatypes In SQLite databases are "Storage Classes":  
