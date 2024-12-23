@@ -1,27 +1,45 @@
-# This is a rough problem-solving script.
-# I knew almost nothing about the data and needed to poke at it 
-#    for a while.  The *_time columns are a mess.
-#  incident_date --> remove bogus time, convert date to pd.date
-#  response_level
-#  call_type --> See: https://en.wikipedia.org/wiki/Medical_Priority_Dispatch_System
-#  Unit_Dispatch_Times --> isolate "team" and "time" components
-#  Unit_Enroute_Times --> isolate "team" and "time" components
-#  Unit_Arrive_Times --> isolate "team" and "time" components
-#  Unit_At_Patient_Times --> isolate "team" and "time" components
-#  Unit_Enroute_To_Hospital_Times --> isolate "team" and "time" components
-#  Unit_Arrive_At_Hospital_Times --> isolate "team" and "time" components
-#  Unit_Staging_Times --> isolate "team" and "time" components
-#  Unit_Fire_Out_Times --> isolate "team" and "time" components
-#  Unit_Clear_Times --> isolate "team" and "time" components
-#  Time_In_Service --> isolate "team" and "time" components
+"""
+ This is a rough problem-solving script.
+
+ I knew almost nothing about the original data and needed to poke at it 
+    for a while.  The *_time columns are a mess.
+  incident_date --> remove bogus time, convert date to pd.date
+  response_level
+  call_type --> See: https://en.wikipedia.org/wiki/Medical_Priority_Dispatch_System
+  Unit_Dispatch_Times --> isolate "team" and "time" components
+  Unit_Enroute_Times --> isolate "team" and "time" components
+  Unit_Arrive_Times --> isolate "team" and "time" components
+  Unit_At_Patient_Times --> isolate "team" and "time" components
+  Unit_Enroute_To_Hospital_Times --> isolate "team" and "time" components
+  Unit_Arrive_At_Hospital_Times --> isolate "team" and "time" components
+  Unit_Staging_Times --> isolate "team" and "time" components
+  Unit_Fire_Out_Times --> isolate "team" and "time" components
+  Unit_Clear_Times --> isolate "team" and "time" components
+  Time_In_Service --> isolate "team" and "time" components
+
+The `..._Times` columns had two dimensions: The column_name, and a collection
+of `unit_name=time` pairs.  Where a given unit_name included data across all 
+the columns, the code below breaks that unit data out into a separate row. The
+goal being to have any given row include data related to a single unit on a 
+single call for service.  There were quite a few original rows that included 
+only partial data for any given unit_name identified in the Unit_Dispatch_Times
+column.
+
+This script emits a csv file having the following columns:
+incident_date, response_unit, call_type, dispatch_time, enroute_time, arrive_time, time_in_service
+
+
+This script is not optimized for speed.  Using the original data it takes 
+from 30 to 60 minutes for completion, depending on the endpoint 
+characteristics.
+
+"""
 
 from pathlib import Path
-# import ast
 import sys
 import os
 import pandas as pd
 import datetime
-# import numpy as np
 import pathlib
 import tempfile
 import string
@@ -61,7 +79,6 @@ def create_target_csv_data_file(csvfile_suffix: str) -> object:
 
 
 def minimum_py(min_python_major_version=3, min_python_minor_version=10):
-    # Use a breakpoint in the code line below to debug your script.
     if sys.version_info < (int(min_python_major_version), int(min_python_minor_version)):
         raise Exception("Use only with Python {min_python_major_version}.{min_python_minor_version} or higher")
     else:
@@ -99,7 +116,6 @@ def report_end(csvfile: str) -> str:
     :type csvfile: str
     :return report_end_msg: end of report message content
     """
-    # print(f"len(temp_data_frame_w_dates) = {length}")
     script_ended = datetime.datetime.now()
     script_ended_utc = datetime.datetime.now(datetime.timezone.utc)
     report_end_msg = f"\n\n{print_separator_line()}\n"
@@ -129,30 +145,24 @@ def data_description(data_frame):
 
 
 def convert_column_to_date(data_frame):
+    """
+    Remove the bogus time from the incident_date column, then 
+    Convert the incident_date column to <class 'pandas._libs.tslibs.timestamps.Timestamp'>
+    which is also datetime64[ns].
+    :param data_frame: DataFrame
+    :type csvfile: str
+    :return: DataFrame
+    """
     for index in data_frame.index:
         # Remove the bogus time from the incident_date column
+        # For a discussion about the reasons for using df.loc[] see:
+        # https://stackoverflow.com/questions/48409128/what-is-the-difference-between-using-loc-and-using-just-square-brackets-to-filte/48411543#48411543
         temp_incident_date = f"{data_frame.loc[index, 'incident_date']}"
         data_frame.loc[index, 'incident_date'] = temp_incident_date.split(' ', 1)[0]
-        # data_frame.loc[index, 'incident_date'] = pd.to_datetime(data_frame.loc[index, 'incident_date']) # # datetime.datetime.strptime(data_frame.loc[index, 'incident_date'], "%m/%d/%y")
-        # print(f'Overview of the data {data_frame.info()}')
-        # print(f"{(data_frame.loc[index, 'incident_date']).strftime('%d/%m/%y')}")
-        # print(f"{(data_frame.loc[index, 'incident_date'])}")
-        # print(f"{type(data_frame.loc[index, 'incident_date'])}")
-        # print(temp_incident_date_slice[0])
-        # date[temp_incident_date_slice[0]] = datetime.strptime(date['incident_date'], "%Y-%m-%d hh:mm [am|pm]")
-    # Convert the incident_date column to <class 'pandas._libs.tslibs.timestamps.Timestamp'>
-    #   which is also datetime64[ns]
-    # Either of the following approaches works, but pandas barks about it.
-    # data_frame['incident_date'] = pd.to_datetime(data_frame['incident_date'])
     # Pandas issue helped parse the dates correctly:
     # https://github.com/pandas-dev/pandas/issues/52167
-    # This is the second way:
     data_frame['incident_date'] = pd.to_datetime(data_frame.loc[:, 'incident_date'], format='mixed')
-    # data_frame['incident_date'] = pd.to_datetime(data_frame.loc[:, 'incident_date'], date_format="%m/%d/%Y %I:%M:%S %p")
-    # Check the data type:
-    # print(f"{type(data_frame.loc[index,'incident_date'])}")
-    # Sanity check the columns of data
-    # print(f'Overview of the data {data_frame.info()}')
+
     return data_frame
 
 
@@ -238,28 +248,10 @@ if __name__ == '__main__':
     if e_data_file.exists():
         emergency_data = pd.read_csv(e_data_file, sep=',')
     # replacing nan values in call_type, Unit_Dispatch_Times and Unit_Enroute_Times with "None"
-    # From: https://www.geeksforgeeks.org/python-pandas-dataframe-fillna-to-replace-null-values-in-dataframe/
-    # emergency_data["call_type"].fillna("None", inplace=True)
-    # that approach is now aging out in favor of pandas 3.0 approach:
-    # 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead
-    # This approach works:
-    # emergency_data.fillna({"call_type": "None"}, inplace=True)
     emergency_data["call_type"] = emergency_data["call_type"].fillna("None")
-    # Old way: emergency_data["Unit_Dispatch_Times"].fillna("None", inplace=True)
-    # emergency_data.fillna({"Unit_Dispatch_Times": "None"}, inplace=True)
     emergency_data["Unit_Dispatch_Times"] = emergency_data["Unit_Dispatch_Times"].fillna("None")
     emergency_data["Unit_Enroute_Times"] = emergency_data["Unit_Enroute_Times"].fillna("None")
     emergency_data["Unit_Arrive_Times"] = emergency_data["Unit_Arrive_Times"].fillna("None")
-    """
-    print(f"{print_separator_line()}")
-    print(f"{print_separator_line()}")
-    print(f'Overview of the data {emergency_data.info()}')
-    print(f"{print_separator_line()}")
-    print(f"{print_separator_line()}")
-    print(f'The data itself: {emergency_data}')
-    print(f"{print_separator_line()}")
-    print(f"{print_separator_line()}")
-    """
     #
     # How many rows & columns are there? What are the column names & types?
     # data_description(emergency_data)
@@ -280,8 +272,6 @@ if __name__ == '__main__':
         # call_type is column 7
         call_type_dict = {}
         temp_str_call_type_dict = temp_data_frame_w_dates.values[counter][7]
-        # stringified_call_type_times: str = ""
-        # stringified_call_type_times = str(temp_str_call_type_dict)
         stringified_unit_dispatch_times: str = ""
         stringified_unit_enroute_times: str = ""
         stringified_unit_arrive_times: str = ""
@@ -301,17 +291,6 @@ if __name__ == '__main__':
         # Time_In_Service is column 17
         temp_str_unit_time_in_service_dict = temp_data_frame_w_dates.values[counter][17]
         stringified_unit_time_in_service_dict = str(temp_str_unit_time_in_service_dict)
-        """
-        # Up to four prints for debugging
-        print(f"temp_str_unit_dispatch_dict = {temp_str_unit_dispatch_dict}")
-        print(f"stringified_unit_dispatch_times = {stringified_unit_dispatch_times}")
-        print(f"temp_str_unit_enroute_dict = {temp_str_unit_enroute_dict}")
-        print(f"stringified_unit_enroute_times = {stringified_unit_enroute_times}")
-        print(f"temp_str_unit_arrive_dict = {temp_str_unit_arrive_dict}")
-        print(f"stringified_unit_arrive_times = {stringified_unit_arrive_times}")
-        print(f"temp_str_unit_time_in_service_dict = {temp_str_unit_time_in_service_dict}")
-        print(f"stringified_unit_time_in_service_dict = {stringified_unit_time_in_service_dict}")
-        """
         #
         # Need data in the 'Unit_Dispatch_Times' column, the 8th column
         # 'Unit_Enroute_Times' column, the 9th column,
@@ -416,25 +395,5 @@ if __name__ == '__main__':
         f.writelines(csv_header_string)
         f.writelines(emergency_data_list)
 
-        """
-        for key in temp_dict:
-            print(f'{type(key)}')
-        counter += 1
-        """
-    # print(f'{emergency_data.head()}')
-    """
-    target_file = 'headers.py'
-    try:
-        fprUtil = shutil.which(target_file)
-    except shutil.Error as err:
-        raise Exception(f'{err}')
-    if fprUtil is None:
-        print(f'Did not find {target_file} in the path. Returned: {fprUtil}')
-    else:
-        print(f'Found: {fprUtil}')
-    """
-    # print(f"len(temp_data_frame_w_dates) = {length}")
-
     print(f"{report_end(str(csv_data_filename))}")
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
