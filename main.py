@@ -157,6 +157,7 @@ def convert_column_to_date(data_frame):
         # Remove the bogus time from the incident_date column
         # For a discussion about the reasons for using df.loc[] see:
         # https://stackoverflow.com/questions/48409128/what-is-the-difference-between-using-loc-and-using-just-square-brackets-to-filte/48411543#48411543
+        # and https://stackoverflow.com/questions/76766136/pandas-pd-to-datetime-assigns-object-dtype-instead-of-datetime64ns
         temp_incident_date = f"{data_frame.loc[index, 'incident_date']}"
         data_frame.loc[index, 'incident_date'] = temp_incident_date.split(' ', 1)[0]
     # Pandas issue helped parse the dates correctly:
@@ -396,4 +397,3 @@ if __name__ == '__main__':
         f.writelines(emergency_data_list)
 
     print(f"{report_end(str(csv_data_filename))}")
-
