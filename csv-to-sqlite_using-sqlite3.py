@@ -44,7 +44,7 @@ cursor = connection.cursor()
 
 # import sqlite3
 # con=sqlite3.connect('ecd.db')
-# filter_data=pd.read_sql_query("""SELECT * FROM emergency_calls""",con)
+# filter_data=pd.read_sql_query(\"""SELECT * FROM emergency_calls\""",con)
 
 # Thank you: Affanhamid
 # https://medium.com/@affanhamid007/how-to-convert-csv-to-sql-database-using-python-and-sqlite3-b693d687c04a
@@ -54,11 +54,11 @@ import sqlite3
 import pandas as pd
 
 # create the database
-conn = sqlite3.connect('2024-12-11_emerg_data_organized_via_sqlite3.db') # Connecting to the database
+conn = sqlite3.connect('2025-02-13_emerg_data_organized_via_sqlite3.db') # Connecting to the database
 cursor = conn.cursor() # Object to run queries
 
 # create an SQLite table
-df = pd.read_csv('2024-12-11_emerg_data_organized.csv')
+df = pd.read_csv('2024-12-22_emerg_data_date_is_now_year_new_time_in_seconds_columns.csv')
 df.info()
 
 # add each of these columns to our query
@@ -67,13 +67,19 @@ table_name = 'emergency_calls'
 create_table_with_types = '''CREATE TABLE IF NOT EXISTS emergency_calls( 
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     incident_date TEXT NOT NULL,
+    incident_date_year_only INTEGER NOT NULL,
     response_unit TEXT NOT NULL,
     call_type TEXT NOT NULL,
     dispatch_time TEXT NOT NULL,
+    dispatch_time_in_seconds INTEGER NOT NULL,
     enroute_time TEXT NOT NULL,
+    enroute_time_in_seconds INTEGER NOT NULL,
     arrive_time TEXT NOT NULL,
-    time_in_service TEXT NOT NULL);
+    arrive_time_in_seconds INTEGER NOT NULL,
+    time_in_service TEXT NOT NULL,
+    time_in_service_in_seconds INTEGER NOT NULL);
     '''
+
 
 # Or something like this:
 # create_table_query = f"CREATE TABLE IF NOT EXISTS {table_name} ({columns_with_types});"
