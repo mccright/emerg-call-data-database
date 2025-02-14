@@ -30,7 +30,7 @@ https://inloop.github.io/sqlite-viewer/
 
 In this use case the input data is in a csv file [2024-12-11_emerg_data_organized.csv].  The output is in SQLite .db files.  
 
-* [main_step_one.py](main_step_one.py) is used to convert the original data from Lincoln County into a dataset rationalized for this exercise -- it output [2024-12-11_emerg_data_organized.csv](2024-12-11_emerg_data_organized.csv).  
+* [main_step_one.py](https://github.com/mccright/emerg-call-data-review/blob/main/main_step_one.py) is used to convert the original data from Lincoln County into a dataset rationalized for this exercise -- it output [2024-12-11_emerg_data_organized.csv](2024-12-11_emerg_data_organized.csv).  
 
 When you run it, be patient. It is slow. To show you it is really doing work it will emit the number of record that it is processing from the original data file and then a short end-of-processing report like that below:  
 ```terminal
@@ -47,9 +47,9 @@ Report Output Files: C:\Files\dev\pycharm\emerg-call-data-timeseries-temp\2025-0
 Process finished with exit code 0
 ```
 
-* [optimize_data_set_step_two.py](optimize_data_set_step_two.py) ingests the organized data from [main_step_one.py] above, and adds columns for the year of each record, and for each column that contains a ```time``` value, it converts the value into a ```seconds``` value to make it easier to do math and comparisons with the original *times*.  
+* [optimize_data_set_step_two.py](https://github.com/mccright/emerg-call-data-review/blob/main/optimize_data_set_step_two.py) ingests the organized data from [main_step_one.py](https://github.com/mccright/emerg-call-data-review/blob/main/main_step_one.py) above, and adds columns for the year of each record, and for each column that contains a ```time``` value, it converts the value into a ```seconds``` value to make it easier to do math and comparisons with the original *times*.  
 
-It runs faster than the [main_step_one.py] and ends with a short end-of-processing report like that below:  
+It runs faster than the [main_step_one.py](https://github.com/mccright/emerg-call-data-review/blob/main/main_step_one.py) and ends with a short end-of-processing report like that below:  
 ```terminal
 - - - - - - - - - - - - - - - - - - - - - - - -
 C:\Files\dev\pycharm\emerg-call-data-timeseries-temp\optimize_data_set.py
