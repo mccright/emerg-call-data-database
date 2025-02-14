@@ -12,23 +12,9 @@ Because it is available virtually everywhere with a minimum of fuss, I used [SQL
 The "clean," munged data has the layout below:  
 
 ```csv
-"incident_date","response_unit","call_type","dispatch_time","enroute_time","arrive_time","time_in_service"
-"2010-01-01","WAVE12","33C2","06:51:33","07:03:23","07:06:23","01:26:48"
-"2010-01-01","WAVE11","28C4","08:05:59","08:06:00","08:08:21","00:59:47"
-"2010-01-01","MWM31","17A1","09:51:58","10:04:41","10:18:57","02:08:33"
-"2010-01-01","PLEA1","17A1","09:51:58","09:57:20","09:59:24","00:40:12"
-"2010-01-01","SE1","19D1","15:48:32","15:48:53","15:53:29","00:20:35"
-"2010-01-01","SE12","19D1","15:58:26","15:53:39","15:58:29","00:33:07"
-"2010-01-02","8707","FIREC","02:02:55","02:02:59","02:59:41","02:48:52"
-"2010-01-02","CERE1","FIREC","01:41:51","01:45:11","01:51:58","02:58:42"
-"2010-01-02","RAYM1","FIREC","01:46:16","01:50:42","02:07:09","01:52:36"
-"2010-01-02","WAVE1","FIREC","01:46:16","01:50:45","02:19:25","01:07:18"
-"2010-01-02","SW1","FIREB","16:33:09","16:34:21","16:49:30","00:26:58"
-"2010-01-02","M5","29D2P","19:08:35","19:09:19","19:21:31","00:13:36"
-"2010-01-02","WAVE12","29D2P","19:08:35","19:12:54","19:21:36","00:13:42"
-"2010-01-02","SE1","10C4","22:55:30","22:56:21","23:09:01","00:48:29"
-"2010-01-02","SE11","10C4","22:55:30","22:57:33","23:08:39","00:48:27"
-"2010-01-03","VALP1","FIREA","08:17:59","08:23:35","08:30:10","00:35:54"
+"incident_date","incident_date_year_only","response_unit","call_type","dispatch_time","dispatch_time_in_seconds","enroute_time","enroute_time_in_seconds","arrive_time","arrive_time_in_seconds","time_in_service","time_in_service_in_seconds"
+"2010-01-01","2010","WAVE12","33C2","06:51:33","24693","07:03:23","25403","07:06:23","25583","01:26:48","5208"
+"2010-01-01","2010","WAVE11","28C4","08:05:59","29159","08:06:00","29160","08:08:21","29301","00:59:47","3587"
 
 ```
 
@@ -46,7 +32,7 @@ In this use case the input data is in a csv file [2024-12-11_emerg_data_organize
 
 * [main.py](main.py) is used to convert the original data from Lincoln County into a dataset rationalized for this exercise -- it output [2024-12-11_emerg_data_organized.csv](2024-12-11_emerg_data_organized.csv).
 
-* [csv-to-sqlite_using-sqlite3.py](csv-to-sqlite_using-sqlite3.py) is used to create [2024-12-11_emerg_data_organized_via_sqlite3.db].    
+* [csv-to-sqlite_using-sqlite3.py](csv-to-sqlite_using-sqlite3.py) is used to create [2025-02-13_emerg_data_organized_via_sqlite3.db].    
 
 * [csv-to-sqlite_using-sqlalchemy.py](csv-to-sqlite_using-sqlalchemy.py) is used to create [2024-12-11_emerg_data_organized_via_sqlalchemy.db].  
 
@@ -127,17 +113,17 @@ What is the median response time on major calls for County ambulances each year?
 			FIREC, GRASFIRE, RSALARM, ECHO, CARFIRE, MEDC, MEDD, MEDE  
 
 ```SQL
-SELECT response_unit, count(response_unit) total_call_count, AVG(time_in_service) avg_time_in_service
+SELECT response_unit, count(response_unit) total_call_count, AVG(time_in_service_in_seconds) avg_time_in_service_in_seconds
    FROM emergency_calls
    WHERE call_type IN ('FIREC', 'GRASFIRE', 'RSALARM', 'ECHO', 'CARFIRE', 'MEDC', 'MEDD', 'MEDE')
    GROUP BY response_unit
-   ORDER BY avg_time_in_service;
+   ORDER BY time_in_service_in_seconds;
 ```
 Returns 101 rows.  
 
 Sanity check these values by just listing all the `time_in_service` values for each response_unit:  
 ```SQL
-SELECT response_unit, count(response_unit) total_call_count, GROUP_CONCAT(time_in_service) times_in_service
+SELECT response_unit, count(response_unit) total_call_count, GROUP_CONCAT(time_in_service_in_seconds) list_of_times_in_service_in_seconds
    FROM emergency_calls
    WHERE call_type IN ('FIREC', 'GRASFIRE', 'RSALARM', 'ECHO', 'CARFIRE', 'MEDC', 'MEDD', 'MEDE')
    GROUP BY response_unit
