@@ -10,7 +10,7 @@ https://inloop.github.io/sqlite-viewer/
 
 ## The databases  
 
-* [csv-to-sqlite_using-sqlite3.py](csv-to-sqlite_using-sqlite3.py) is used to create [2025-02-13_emerg_data_organized_via_sqlite3.db].  
+* [csv-to-sqlite_using-sqlite3.py](csv-to-sqlite_using-sqlite3.py) is used to create [2025-02-13_emerg_data_organized_via_sqlite3.db](2025-02-13_emerg_data_organized_via_sqlite3.db).  
 
 ### Database Schema  
 You will need to know the column names & types to craft your SQL.  
@@ -39,10 +39,11 @@ My primary tool for exploring the SQLite-hosted data is: https://sqlitebrowser.o
 
 The response_unit is the name of a given team, dispatch_time is when they received a call for service and time_in_service is the amount of time a given response_unit spent on that given service call.  
 
-LFR Ambulances are noted by "M," signifying "Medic" followed by a number.  
+```terminalLFR Ambulances are noted by "M," signifying "Medic" followed by a number.  
 	These include:  
 		'''M1, M2, M3, M5, M6, M7, M8, M10, M21, M24, M25'''  
-		There may be other M-units listed in the data, but my sense is that those are typos or are very rarely called and will not affect the general sense of the data.  
+		There may be other M-units listed in the data, but my sense is that those are typos or are very rarely called and will not affect the general sense of the data.
+```
 
 First, review the data for response_unit values that begin with 'M':  
 ```terminal
@@ -104,11 +105,13 @@ M6	309	2128
 
 
 What is the median response time on major calls for County ambulances each year?  
+```terminal
 "Major Calls" are "call_type":  
 		 That include "Sub Category" C (Charlie), D (Delta), or E (Echo) \  
 		 as defined by the file "[110520 Master Run Sheet.xlsx](https://github.com/mccright/emerg-call-data-review/blob/main/rawdata/110520_Master_Run_Sheet.xlsx)"  
 		call_type:  
-			FIREC, GRASFIRE, RSALARM, ECHO, CARFIRE, MEDC, MEDD, MEDE  
+			FIREC, GRASFIRE, RSALARM, ECHO, CARFIRE, MEDC, MEDD, MEDE
+```
 
 ```SQL
 SELECT response_unit, count(response_unit) AS total_call_count, AVG(time_in_service_in_seconds) AS avg_time_in_service_in_seconds
@@ -163,7 +166,7 @@ Window Functions
 https://www.sqlite.org/windowfunctions.html
 
 ### Random SQL Notes:  
-```terminal
+```SQL
 PRAGMA table_list;
 PRAGMA table_list(emergency_calls);
 PRAGMA main.table_info(emergency_calls);
@@ -178,73 +181,73 @@ SELECT * FROM 'emergency_calls' WHERE incident_date > "2010-01-01" AND incident_
 SELECT * FROM 'emergency_calls' WHERE incident_date_year_only = 2012 LIMIT 0,60
 SELECT * FROM 'emergency_calls' WHERE dispatch_time < "09:51:59" LIMIT 0,200
 
-# The following emits the number of calls (any call_type) per unit over the entire db scope
-# ordered by response_unit
+-- The following emits the number of calls (any call_type) per unit over the entire db scope
+-- ordered by response_unit
 SELECT response_unit, count(call_type)
    FROM emergency_calls
    GROUP BY response_unit
-#
-# The following emits the number of distinct call_types per unit over the entire db scope
-# ordered by call_type_count
+
+-- The following emits the number of distinct call_types per unit over the entire db scope
+-- ordered by call_type_count
 SELECT response_unit, count(DISTINCT call_type) AS call_type_count
    FROM emergency_calls
    GROUP BY response_unit
    ORDER BY call_type_count;
-#
-# The following emits the number of distinct_call_types, total_call_count (any call_type) per unit over the entire db scope
-# This may help identify (then weed out) some noise in the data.
-# For example, should be "care about" a response_unit that has one call over 10 years? ...2? ...4? 
-# What is the threshold below which we ignore given response_unit's records?
+
+-- The following emits the number of distinct_call_types, total_call_count (any call_type) per unit over the entire db scope
+-- This may help identify (then weed out) some noise in the data.
+-- For example, should be "care about" a response_unit that has one call over 10 years? ...2? ...4? 
+-- What is the threshold below which we ignore given response_unit's records?
 SELECT response_unit, count(DISTINCT call_type) AS distinct_call_types, count(response_unit) AS total_call_count
    FROM emergency_calls
    GROUP BY response_unit
    ORDER BY distinct_call_types;
-#
-# The following emits the number of distinct_call_types, total_call_count (any call_type) per unit over the entire db scope
-# ordered by the response_unit name.  This may be easier for some to navigate.  The question remains, 
-# What is the # of calls threshold below which we ignore given response_unit's records?
-# This may help identify (then weed out) some noise in the data.
+   
+-- The following emits the number of distinct_call_types, total_call_count (any call_type) per unit over the entire db scope
+-- ordered by the response_unit name.  This may be easier for some to navigate.  The question remains, 
+-- What is the num. of calls threshold below which we ignore given response_unit's records?
+-- This may help identify (then weed out) some noise in the data.
 SELECT response_unit, count(DISTINCT call_type) AS distinct_call_types, count(response_unit) AS total_call_count
    FROM emergency_calls
    GROUP BY response_unit
    ORDER BY response_unit;
-#
-# The following emits each unit and a list of all the call_types in their records
+
+-- The following emits each unit and a list of all the call_types in their records
 SELECT response_unit, GROUP_CONCAT(call_type) AS call_types
    FROM emergency_calls
    GROUP BY response_unit
    HAVING MIN(call_type) <> MAX(call_type);
-#
-# What call types are the longest for teams?
+
+-- What call types are the longest for teams?
 SELECT response_unit, call_type, time_in_service
    FROM emergency_calls
    WHERE time_in_service > "01:30:00"
    GROUP BY call_type
-#
-# What call types are the longest, and how long is each call of that type?
+
+-- What call types are the longest, and how long is each call of that type?
 SELECT call_type, GROUP_CONCAT(time_in_service)
     FROM emergency_calls
     WHERE time_in_service > "01:45:00"
     GROUP BY call_type
     ORDER BY call_type
-#
-# What call types do each of the units serve?
+
+-- What call types do each of the units serve?
 SELECT call_type, GROUP_CONCAT(response_unit)
     FROM emergency_calls
     GROUP BY call_type
     ORDER BY call_type
-#
-# The following emits each unit and a list of all the call_types in their records by date
-# This illustrates which units are dealing with more calls per day
+
+-- The following emits each unit and a list of all the call_types in their records by date
+-- This illustrates which units are dealing with more calls per day
 SELECT response_unit, count(call_type)
    FROM emergency_calls
    GROUP BY response_unit
-# or 
+-- or 
 SELECT incident_date, response_unit, GROUP_CONCAT(call_type) AS call_types
    FROM emergency_calls
    GROUP BY response_unit
 
-# incident_date","response_unit","call_type","dispatch_time","enroute_time","arrive_time","time_in_service"
+-- incident_date","response_unit","call_type","dispatch_time","enroute_time","arrive_time","time_in_service"
 ```
 
 
