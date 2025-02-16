@@ -81,7 +81,7 @@ M6	309	2128
 There are 11 response units that have a total_call_count of less than 25, so lets drop them and query only the remaining response_unit names:  
 * Quality check for those "M" LFR ambulance designators in the data tht have more than 24 calls:  
 ```terminal
-SELECT response_unit, count(DISTINCT call_type) distinct_call_types, count(response_unit) total_call_count
+SELECT response_unit, count(DISTINCT call_type) AS distinct_call_types, count(response_unit) AS total_call_count
    FROM emergency_calls
    WHERE response_unit IN ('M6', 'MALC1', 'M5', 'M3', 'M8', 'MALC10', 'M7', 'M2', 'M10', 'MWM31', 'MALC2')
    GROUP BY response_unit
@@ -111,7 +111,7 @@ What is the median response time on major calls for County ambulances each year?
 			FIREC, GRASFIRE, RSALARM, ECHO, CARFIRE, MEDC, MEDD, MEDE  
 
 ```SQL
-SELECT response_unit, count(response_unit) total_call_count, AVG(time_in_service_in_seconds) avg_time_in_service_in_seconds
+SELECT response_unit, count(response_unit) AS total_call_count, AVG(time_in_service_in_seconds) AS avg_time_in_service_in_seconds
    FROM emergency_calls
    WHERE call_type IN ('FIREC', 'GRASFIRE', 'RSALARM', 'ECHO', 'CARFIRE', 'MEDC', 'MEDD', 'MEDE')
    GROUP BY response_unit
@@ -119,9 +119,9 @@ SELECT response_unit, count(response_unit) total_call_count, AVG(time_in_service
 ```
 Returns 101 rows.  
 
-Sanity check these values by just listing all the `time_in_service` values for each response_unit:  
+Sanity check these values by just listing all the `time_in_service` values for each response_unit and reviewing them visually to confirm your assumptions:  
 ```SQL
-SELECT response_unit, count(response_unit) total_call_count, GROUP_CONCAT(time_in_service_in_seconds) list_of_times_in_service_in_seconds
+SELECT response_unit, count(response_unit) AS total_call_count, GROUP_CONCAT(time_in_service_in_seconds) AS list_of_times_in_service_in_seconds
    FROM emergency_calls
    WHERE call_type IN ('FIREC', 'GRASFIRE', 'RSALARM', 'ECHO', 'CARFIRE', 'MEDC', 'MEDD', 'MEDE')
    GROUP BY response_unit
@@ -162,6 +162,7 @@ https://www.sqlite.org/lang_corefunc.html
 Window Functions
 https://www.sqlite.org/windowfunctions.html
 
+### Random SQL Notes:  
 ```terminal
 PRAGMA table_list;
 PRAGMA table_list(emergency_calls);
@@ -185,7 +186,7 @@ SELECT response_unit, count(call_type)
 #
 # The following emits the number of distinct call_types per unit over the entire db scope
 # ordered by call_type_count
-SELECT response_unit, count(DISTINCT call_type) call_type_count
+SELECT response_unit, count(DISTINCT call_type) AS call_type_count
    FROM emergency_calls
    GROUP BY response_unit
    ORDER BY call_type_count;
@@ -194,7 +195,7 @@ SELECT response_unit, count(DISTINCT call_type) call_type_count
 # This may help identify (then weed out) some noise in the data.
 # For example, should be "care about" a response_unit that has one call over 10 years? ...2? ...4? 
 # What is the threshold below which we ignore given response_unit's records?
-SELECT response_unit, count(DISTINCT call_type) distinct_call_types, count(response_unit) total_call_count
+SELECT response_unit, count(DISTINCT call_type) AS distinct_call_types, count(response_unit) AS total_call_count
    FROM emergency_calls
    GROUP BY response_unit
    ORDER BY distinct_call_types;
@@ -203,19 +204,19 @@ SELECT response_unit, count(DISTINCT call_type) distinct_call_types, count(respo
 # ordered by the response_unit name.  This may be easier for some to navigate.  The question remains, 
 # What is the # of calls threshold below which we ignore given response_unit's records?
 # This may help identify (then weed out) some noise in the data.
-SELECT response_unit, count(DISTINCT call_type) distinct_call_types, count(response_unit) total_call_count
+SELECT response_unit, count(DISTINCT call_type) AS distinct_call_types, count(response_unit) AS total_call_count
    FROM emergency_calls
    GROUP BY response_unit
    ORDER BY response_unit;
 #
 # The following emits each unit and a list of all the call_types in their records
-SELECT response_unit, GROUP_CONCAT(call_type) call_types
+SELECT response_unit, GROUP_CONCAT(call_type) AS call_types
    FROM emergency_calls
    GROUP BY response_unit
    HAVING MIN(call_type) <> MAX(call_type);
 #
 # What call types are the longest for teams?
-SELECT response_unit, time_in_service
+SELECT response_unit, call_type, time_in_service
    FROM emergency_calls
    WHERE time_in_service > "01:30:00"
    GROUP BY call_type
@@ -239,7 +240,7 @@ SELECT response_unit, count(call_type)
    FROM emergency_calls
    GROUP BY response_unit
 # or 
-SELECT incident_date, response_unit, GROUP_CONCAT(call_type) call_types
+SELECT incident_date, response_unit, GROUP_CONCAT(call_type) AS call_types
    FROM emergency_calls
    GROUP BY response_unit
 
