@@ -27,6 +27,8 @@ create_table_with_types = '''CREATE TABLE IF NOT EXISTS emergency_calls(
     enroute_time_in_seconds INTEGER NOT NULL,
     arrive_time TEXT NOT NULL,
     arrive_time_in_seconds INTEGER NOT NULL,
+    response_time_in_seconds INTEGER NOT NULL,
+    response_time TEXT NOT NULL,
     time_in_service TEXT NOT NULL,
     time_in_service_in_seconds INTEGER NOT NULL);
     '''
