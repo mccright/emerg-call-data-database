@@ -54,11 +54,14 @@ import sqlite3
 import pandas as pd
 
 # create the database
-conn = sqlite3.connect('2025-02-13_emerg_data_organized_via_sqlite3.db') # Connecting to the database
+conn = sqlite3.connect('2025-03-20_emerg_data_organized_via_sqlite3.db') # Connecting to the database
 cursor = conn.cursor() # Object to run queries
 
 # create an SQLite table
-df = pd.read_csv('2024-12-22_emerg_data_date_is_now_year_new_time_in_seconds_columns.csv')
+# old data
+# df = pd.read_csv('2024-12-22_emerg_data_date_is_now_year_new_time_in_seconds_columns.csv')
+# new data, incl. 'response_time_in_seconds' & 'response_time' columns
+df = pd.read_csv('usable_output_file.csv')
 df.info()
 
 # add each of these columns to our query
@@ -76,6 +79,8 @@ create_table_with_types = '''CREATE TABLE IF NOT EXISTS emergency_calls(
     enroute_time_in_seconds INTEGER NOT NULL,
     arrive_time TEXT NOT NULL,
     arrive_time_in_seconds INTEGER NOT NULL,
+    response_time_in_seconds INTEGER NOT NULL,
+    response_time TEXT NOT NULL,
     time_in_service TEXT NOT NULL,
     time_in_service_in_seconds INTEGER NOT NULL);
     '''
