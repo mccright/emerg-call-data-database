@@ -134,6 +134,197 @@ SELECT response_unit, count(response_unit) AS total_call_count, GROUP_CONCAT(tim
 ```
 
 
+```SQL
+-- example of building a query for a specified list of values
+SELECT response_unit, count(DISTINCT call_type) AS distinct_call_types, count(response_unit) AS total_call_count
+   FROM emergency_calls
+   WHERE response_unit IN ('M6', 'MALC1', 'M5', 'M3', 'M8', 'MALC10', 'M7', 'M2', 'M10', 'MWM31', 'MALC2')
+   GROUP BY response_unit
+   ORDER BY distinct_call_types;
+```
+
+
+```SQL
+-- example of using 'LIKE' when you don't want to build a list
+SELECT response_unit, count(DISTINCT call_type) distinct_call_types, count(response_unit) total_call_count
+   FROM emergency_calls
+   WHERE response_unit LIKE 'M%'
+   GROUP BY response_unit
+   ORDER BY distinct_call_types;
+```
+
+
+```SQL
+SELECT response_unit, count(response_unit) AS total_call_count, 
+CAST(AVG(time_in_service_in_seconds) AS INTEGER) AS time_in_service_in_seconds_integer
+   FROM emergency_calls
+   WHERE call_type IN ('FIREC', 'GRASFIRE', 'RSALARM', 'ECHO', 'CARFIRE', 'MEDC', 'MEDD', 'MEDE')
+   GROUP BY response_unit
+   ORDER BY time_in_service_in_seconds_integer;
+```
+
+
+```SQL
+-- Average response_time and total call count for a given list of call_type's
+-- for each response_unit across all the data
+SELECT response_unit, count(response_unit) AS total_call_count, 
+CAST(AVG(response_time_in_seconds) AS INTEGER) AS avg_response_time_in_seconds_integer
+   FROM emergency_calls
+   WHERE call_type IN ('FIREC', 'GRASFIRE', 'RSALARM', 'ECHO', 'CARFIRE', 'MEDC', 'MEDD', 'MEDE')
+   GROUP BY response_unit
+   ORDER BY avg_response_time_in_seconds_integer;
+```
+
+
+```SQL
+SELECT response_unit, call_type, dispatch_time, arrive_time, response_time_in_seconds, response_time
+   FROM emergency_calls
+   WHERE response_unit LIKE 'E15%'
+
+```
+
+
+```SQL
+-- List of call_type's for each response_unit across all data
+SELECT response_unit, GROUP_CONCAT(call_type) call_types
+   FROM emergency_calls
+   GROUP BY response_unit
+   HAVING MIN(call_type) &lt;&gt; MAX(call_type);
+```
+
+
+```SQL
+-- average call times by response_unit for a specified year
+SELECT incident_date_year_only, response_unit, count(response_unit) total_call_count, AVG(time_in_service_in_seconds) avg_time_in_service_in_seconds
+   FROM 'emergency_calls' 
+   WHERE (incident_date_year_only = 2019)
+   AND (call_type IN ('FIREC', 'GRASFIRE', 'RSALARM', 'ECHO', 'CARFIRE', 'MEDC', 'MEDD', 'MEDE'))
+   GROUP BY response_unit
+   ORDER BY avg_time_in_service_in_seconds;
+```
+
+
+```SQL
+-- average call times by response_unit for a specified year
+SELECT incident_date_year_only, response_unit, count(response_unit) total_call_count,
+CAST(AVG(response_time_in_seconds) AS INTEGER) AS avg_response_time_in_seconds_integer,
+CAST(AVG(time_in_service_in_seconds) AS INTEGER) AS time_in_service_in_seconds_integer
+   FROM 'emergency_calls' 
+   WHERE (incident_date_year_only = 2019)
+   AND (call_type IN ('FIREC', 'GRASFIRE', 'RSALARM', 'ECHO', 'CARFIRE', 'MEDC', 'MEDD', 'MEDE'))
+   AND NOT response_unit = 'E15' -- Assume it's entry was a mistake
+   GROUP BY response_unit
+   ORDER BY avg_response_time_in_seconds_integer DESC;
+```
+
+
+```SQL
+-- average incident response times and in-service times by response_unit for a specified range of years
+SELECT incident_date_year_only, response_unit, count(response_unit) total_call_count, 
+CAST(AVG(response_time_in_seconds) AS INTEGER) AS avg_response_time_in_seconds_integer, 
+CAST(AVG(time_in_service_in_seconds) AS INTEGER) AS time_in_service_in_seconds_integer
+   FROM 'emergency_calls' 
+   WHERE (incident_date_year_only &gt; 2013 AND incident_date_year_only &lt; 2019)
+   AND (call_type IN ('FIREC', 'GRASFIRE', 'RSALARM', 'ECHO', 'CARFIRE', 'MEDC', 'MEDD', 'MEDE'))
+   GROUP BY incident_date_year_only, response_unit
+   ORDER BY response_unit;
+</sql>```
+
+
+```SQL
+-- average incident response times and in-service times by specified response_units for each year in dataset
+-- The result of AVG() is always a floating point, even if all inputs are integers.
+SELECT incident_date_year_only, response_unit, count(response_unit) total_call_count,
+CAST(AVG(response_time_in_seconds) AS INTEGER) AS avg_response_time_in_seconds_integer, 
+CAST(AVG(time_in_service_in_seconds) AS INTEGER) AS time_in_service_in_seconds_integer
+   FROM 'emergency_calls' 
+   WHERE (response_unit IN ('M6', 'MALC1', 'M5', 'M3', 'M8', 'MALC10', 'M7', 'M2', 'M10', 'MWM31', 'MALC2'))
+   AND (call_type IN ('FIREC', 'GRASFIRE', 'RSALARM', 'ECHO', 'CARFIRE', 'MEDC', 'MEDD', 'MEDE'))
+   GROUP BY incident_date_year_only, response_unit
+   ORDER BY response_unit, incident_date_year_only;
+```
+
+
+```SQL
+-- average incident response times and in-service times 
+-- for specified response_units for all years in the dataset.
+-- total_call_count is included to help sanity check avg_time_in_service_in_seconds values.
+SELECT incident_date_year_only, response_unit, count(response_unit) total_call_count,
+CAST(AVG(response_time_in_seconds) AS INTEGER) AS avg_response_time_in_seconds_integer, 
+CAST(AVG(time_in_service_in_seconds) AS INTEGER) AS time_in_service_in_seconds_integer
+   FROM 'emergency_calls' 
+   WHERE (response_unit IN ('M1', 'M2', 'M3', 'M5', 'M6', 'M7', 'M8', 'M10', 'M21', 'M24', 'M25', 'MALC1', 'MALC10', 'MWM31', 'MALC2'))
+   AND (call_type IN ('FIREC', 'GRASFIRE', 'RSALARM', 'ECHO', 'CARFIRE', 'MEDC', 'MEDD', 'MEDE'))
+   GROUP BY incident_date_year_only, response_unit
+   ORDER BY response_unit, incident_date_year_only;
+```
+
+
+```SQL
+-- Unique response_units (135 of them) with number of calls for each in the dataset
+-- ordered by response_unit name
+-- Use to help determine which response_unit names may be ignored
+SELECT response_unit, count(response_unit) total_call_count
+   FROM 'emergency_calls' 
+   GROUP BY response_unit
+   ORDER BY response_unit;
+```
+
+
+```SQL
+-- Unique response_units (135 of them) with number of calls for each in the dataset
+-- ordered by response_unit name
+-- Use to help determine which response_unit names may be ignored
+SELECT response_unit, count(response_unit) total_call_count
+   FROM 'emergency_calls' 
+   GROUP BY response_unit
+   ORDER BY total_call_count DESC;
+```
+
+
+```SQL
+-- average incident response times and in-service times 
+-- for specified response_units for all years in the dataset.
+-- total_call_count is included to help sanity check avg_time_in_service_in_seconds values.
+SELECT incident_date_year_only, response_unit, count(response_unit) total_call_count, 
+CAST(AVG(response_time_in_seconds) AS INTEGER) AS avg_response_time_in_seconds_integer, 
+CAST(AVG(time_in_service_in_seconds) AS INTEGER) AS time_in_service_in_seconds_integer
+   FROM 'emergency_calls' 
+   WHERE (response_unit IN ('M1', 'M2', 'M3', 'M5', 'M6', 'M7', 'M8', 'M10', 'M21', 'M24', 'M25', 'MALC1', 'MALC10', 'MWM31', 'MALC2'))
+   AND (call_type IN ('FIREC', 'GRASFIRE', 'RSALARM', 'ECHO', 'CARFIRE', 'MEDC', 'MEDD', 'MEDE'))
+   GROUP BY incident_date_year_only, response_unit
+   ORDER BY response_unit, incident_date_year_only;
+```
+
+
+```SQL
+-- List every call_type, the number of incidents for each call type, 
+-- the average response_time_in_seconds and the average time_in_service_in_seconds
+-- for each call type.  [556 rows returned]
+SELECT DISTINCT call_type, count(call_type) total_call_type_count,
+CAST(AVG(response_time_in_seconds) AS INTEGER) AS avg_response_time_in_seconds_integer, 
+CAST(AVG(time_in_service_in_seconds) AS INTEGER) AS time_in_service_in_seconds_integer
+   FROM 'emergency_calls' 
+   -- WHERE response_unit = 'M1'
+   GROUP BY call_type
+   ORDER BY total_call_type_count DESC;
+```
+
+
+```SQL
+-- Unique response_units (135 of them) with number of calls for each in the dataset
+-- ordered by response_unit name
+-- Use to help determine which response_unit names may be ignored
+SELECT response_unit, count(response_unit) total_call_count
+   FROM 'emergency_calls' 
+   GROUP BY response_unit
+   ORDER BY total_call_count DESC;</sql><current_tab id="15"/></tab_sql></sqlb_project>
+```
+
+
+-----
+
+
 ### Reference thoughts -- unfinished  
 
 Table Definition (https://sqlite.org/datatype3.html)  
