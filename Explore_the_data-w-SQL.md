@@ -318,9 +318,45 @@ CAST(AVG(time_in_service_in_seconds) AS INTEGER) AS time_in_service_in_seconds_i
 SELECT response_unit, count(response_unit) total_call_count
    FROM 'emergency_calls' 
    GROUP BY response_unit
-   ORDER BY total_call_count DESC;</sql><current_tab id="15"/></tab_sql></sqlb_project>
+   ORDER BY total_call_count DESC;
 ```
 
+
+* How best to identify the mean for columns and for grouped values?  
+
+One approach for whole columns is:  
+```SQL
+-- This gets the median (the element in the middle of an ordered list)
+-- of the response_time_in_seconds column of the emergency_calls table 
+SELECT response_time_in_seconds
+FROM 'emergency_calls' 
+ORDER BY response_time_in_seconds
+LIMIT 1
+OFFSET (SELECT COUNT(response_time_in_seconds)
+        FROM 'emergency_calls') / 2
+```
+Result median response_time_in_seconds = 695  
+
+
+```SQL
+-- This gets the median (the element in the middle of an ordered list)
+-- of the time_in_service_in_seconds column of the emergency_calls table 
+SELECT time_in_service_in_seconds
+FROM 'emergency_calls' 
+ORDER BY time_in_service_in_seconds
+LIMIT 1
+OFFSET (SELECT COUNT(time_in_service_in_seconds)
+        FROM 'emergency_calls') / 2
+
+```
+Result median time_in_service_in_seconds = 3141  
+
+
+What about getting the median for a subset of a column (GROUP BY or PARTITION)?
+This looks like a potential model: https://stackoverflow.com/questions/65212352/calculating-median-in-sqlite  
+https://dbfiddle.uk/loGSXFZ3  
+
+https://www.sqlitetutorial.net/
 
 -----
 
