@@ -39,22 +39,49 @@ My primary tool for exploring the SQLite-hosted data is: https://sqlitebrowser.o
 
 ### My working notes...  
 
+What period of time does this data represent?  In this case, we can count the unique *years* listed in all the database records.  
+```SQL
+SELECT count(DISTINCT incident_date_year_only) AS incident_date_year_count
+   FROM 'emergency_calls'
+```
+Result = 11  
+
+
+The ```response_unit``` is the name of a given team.  How many unique ```response_unit``` strings are included in the database?  
+```SQL
+SELECT count(DISTINCT response_unit) AS response_unit_count
+   FROM 'emergency_calls'
+```
+Result = 135  
+This number is inflated because the initial responder to an incident call is (*at least most of the time*) an individual, who is a member of the ```response_unit``` that *may* end up responding to a given call.  
+
+
+
+The ```call_type``` is an assembledge of indicators that coarsely describe the nature and priority of the situation that is associated with any given incident. How many unique ```call_type``` strings are included in the database?  
+```SQL
+SELECT count(DISTINCT call_type) AS call_type_count
+   FROM 'emergency_calls'
+```
+Result = 556  
+
 The response_unit is the name of a given team, dispatch_time is when they received a call for service and time_in_service is the amount of time a given response_unit spent on that given service call.  
 
-```terminalLFR Ambulances are noted by "M," signifying "Medic" followed by a number.  
+```terminal
+LFR Ambulances are noted by "M," signifying "Medic" followed by a number.  
 	These include:  
 		'''M1, M2, M3, M5, M6, M7, M8, M10, M21, M24, M25'''  
 		There may be other M-units listed in the data, but my sense is that those are typos or are very rarely called and will not affect the general sense of the data.
 ```
 
 First, review the data for response_unit values that begin with 'M':  
-```terminal
+```SQL
 SELECT response_unit, count(DISTINCT call_type) distinct_call_types, count(response_unit) total_call_count
    FROM emergency_calls
    WHERE response_unit LIKE 'M%'
    GROUP BY response_unit
    ORDER BY distinct_call_types;
-
+```
+```terminal
 response_unit	distinct_call_types	total_call_count
 M21	1	1
 MILF10	1	1
@@ -83,13 +110,14 @@ M6	309	2128
 
 There are 11 response units that have a total_call_count of less than 25, so lets drop them and query only the remaining response_unit names:  
 * Quality check for those "M" LFR ambulance designators in the data tht have more than 24 calls:  
-```terminal
+```SQL
 SELECT response_unit, count(DISTINCT call_type) AS distinct_call_types, count(response_unit) AS total_call_count
    FROM emergency_calls
    WHERE response_unit IN ('M6', 'MALC1', 'M5', 'M3', 'M8', 'MALC10', 'M7', 'M2', 'M10', 'MWM31', 'MALC2')
    GROUP BY response_unit
    ORDER BY distinct_call_types;
-
+```
+```terminal
 response_unit	distinct_call_types	total_call_count
 MALC2	13	25
 M10	33	61
