@@ -36,6 +36,8 @@ create_table_with_types = '''CREATE TABLE IF NOT EXISTS emergency_calls(
 
 
 My primary tool for exploring the SQLite-hosted data is: https://sqlitebrowser.org  
+When I was required to use databases from a range of vendors, I also used https://www.heidisql.com/.  
+
 
 ### My working notes...  
 
