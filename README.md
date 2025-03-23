@@ -25,6 +25,8 @@ Two tools for exploring the SQLite-hosted data:
 https://sqlitebrowser.org  
 or in your browser:  
 https://inloop.github.io/sqlite-viewer/  
+(*When I was required to use databases from a range of vendors, I also used https://www.heidisql.com/ and it supports SQLite as well.*)  
+
 
 
 ## The databases  
