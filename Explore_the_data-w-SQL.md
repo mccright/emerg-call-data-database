@@ -10,7 +10,7 @@ https://inloop.github.io/sqlite-viewer/
 
 ## The databases  
 
-* [csv-to-sqlite_using-sqlite3.py](csv-to-sqlite_using-sqlite3.py) is used to create [2025-02-13_emerg_data_organized_via_sqlite3.db](2025-02-13_emerg_data_organized_via_sqlite3.db).  
+* [step_five_csv-to-sqlite_using-sqlite3.py](step_five_csv-to-sqlite_using-sqlite3.py) is used to create [2025-08-01_emerg_data_organized_via_sqlite3.db](2025-08-01_emerg_data_organized_via_sqlite3.db).  
 
 ### Database Schema  
 You will need to know the column names & types to craft your SQL.  
@@ -19,8 +19,12 @@ create_table_with_types = '''CREATE TABLE IF NOT EXISTS emergency_calls(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     incident_date TEXT NOT NULL,
     incident_date_year_only INTEGER NOT NULL,
+    incident_num INTEGER NOT NULL,
     response_unit TEXT NOT NULL,
+    response_level TEXT NOT NULL,
     call_type TEXT NOT NULL,
+    sub_category TEXT NOT NULL,
+    determinant_description TEXT NOT NULL,
     dispatch_time TEXT NOT NULL,
     dispatch_time_in_seconds INTEGER NOT NULL,
     enroute_time TEXT NOT NULL,
@@ -41,12 +45,29 @@ When I was required to use databases from a range of vendors, I also used https:
 
 ### My working notes...  
 
+How many rows are in this database?  
+```SQL
+SELECT count(incident_num) AS record_count
+   FROM 'emergency_calls'
+```
+record_count = 22829
+
 What period of time does this data represent?  In this case, we can count the unique *years* listed in all the database records.  
 ```SQL
 SELECT count(DISTINCT incident_date_year_only) AS incident_date_year_count
    FROM 'emergency_calls'
 ```
 Result = 11  
+
+
+Show only calls of calltype sub_categorys "bravo" "charlie" or "delta":
+```SQL
+select * FROM emergency_calls
+WHERE sub_category = "bravo" or
+sub_category = "charlie" or
+sub_category = "delta"
+```
+Result: 12214 rows returned
 
 
 The ```response_unit``` is the name of a given team.  How many unique ```response_unit``` strings are included in the database?  
