@@ -129,7 +129,7 @@ Process finished with exit code 0
 It runs in seconds, not minutes...  
 
 ```terminal
-C:\dev\pycharm\emerg-call-data-timeseries\venv\Scripts\python.exe C:\dev\pycharm\emerg-call-data-timeseries\step_four_build_criticality_columns.py 
+C:\Files\dev\github\emerg-call-data-timeseries-temp\venv\Scripts\python.exe C:\Files\dev\pycharm\emerg-call-data-timeseries-temp\step_four_build_criticality_columns.py 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 The number of columns in "2025-08-01_add_response_time_columns_step_three.csv" is: 16
 csv_raw_data type = <class 'csv.DictReader'>
@@ -137,14 +137,16 @@ csv_raw_data type = <class 'csv.DictReader'>
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 21991 found
 838 missing
+CTNIMRS == Call Type not in Master Run Sheet.
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-The number of columns in "C:\dev\pycharm\emerg-call-data-timeseries\2025-08-01_emerg_data_organized_step_four.csv" is: 18
+The number of columns in "C:\Files\dev\pycharm\emerg-call-data-timeseries-temp\2025-08-02_emerg_data_organized_step_four.csv" is: 18
 output header fields/columns: ['incident_date', 'incident_date_year_only', 'incident_num', 'response_unit', 'response_level', 'call_type', 'sub_category', 'determinant_description', 'dispatch_time', 'dispatch_time_in_seconds', 'enroute_time', 'enroute_time_in_seconds', 'arrive_time', 'arrive_time_in_seconds', 'response_time', 'response_time_in_seconds', 'time_in_service', 'time_in_service_in_seconds']
 Data processing complete. 
 Input file is "2025-08-01_add_response_time_columns_step_three.csv".
-Result saved in "C:\dev\pycharm\emerg-call-data-timeseries\2025-08-01_emerg_data_organized_step_four.csv".
+Result saved in "C:\Files\dev\pycharm\emerg-call-data-timeseries-temp\2025-08-02_emerg_data_organized_step_four.csv".
 
 Process finished with exit code 0
+
 ```
 
 
