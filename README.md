@@ -11,6 +11,35 @@ Because it is available virtually everywhere with a minimum of fuss, I used [SQL
 
 The "clean," munged data has the layout below:  
 
+```python
+table_name = 'emergency_calls'
+
+create_table_with_types = '''CREATE TABLE IF NOT EXISTS emergency_calls( 
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    incident_date TEXT NOT NULL,
+    incident_date_year_only INTEGER NOT NULL,
+    incident_num INTEGER NOT NULL,
+    response_unit TEXT NOT NULL,
+    response_level TEXT NOT NULL,
+    call_type TEXT NOT NULL,
+    sub_category TEXT NOT NULL,
+    determinant_description TEXT NOT NULL,
+    dispatch_time TEXT NOT NULL,
+    dispatch_time_in_seconds INTEGER NOT NULL,
+    enroute_time TEXT NOT NULL,
+    enroute_time_in_seconds INTEGER NOT NULL,
+    arrive_time TEXT NOT NULL,
+    arrive_time_in_seconds INTEGER NOT NULL,
+    response_time_in_seconds INTEGER NOT NULL,
+    response_time TEXT NOT NULL,
+    time_in_service TEXT NOT NULL,
+    time_in_service_in_seconds INTEGER NOT NULL);
+    '''
+
+```
+
+And the input data looks like:  
+
 ```csv
 incident_date,incident_date_year_only,incident_num,response_unit,response_level,call_type,sub_category,determinant_description,dispatch_time,dispatch_time_in_seconds,enroute_time,enroute_time_in_seconds,arrive_time,arrive_time_in_seconds,response_time,response_time_in_seconds,time_in_service,time_in_service_in_seconds
 2010-01-01,2010,10000031,WAVE12,MA,33C2,CTNIMRS,CTNIMRS,06:51:33,24693,07:03:23,25403,07:06:23,25583,00:14:50,890,01:26:48,5208
