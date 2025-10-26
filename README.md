@@ -222,4 +222,9 @@ Process finished with exit code 0
 ### Exploring the data...  
 
 See the [Explore_the_data-w-SQL.md](Explore_the_data-w-SQL.md) page for a range of SQL for exploring the data.  
+AND these resources might be useful:  
+* [https://www.sqltutorial.org/](https://www.sqltutorial.org/)  
+* [SQL%20cheat%20sheet%20(rebellabs).pdf](https://github.com/jramshur/Coding-Cheat-Sheets/blob/master/SQL%20cheat%20sheet%20(rebellabs).pdf)  
+* [SQL-cheat-sheet%20(sqltutorial.org).pdf](https://github.com/jramshur/Coding-Cheat-Sheets/blob/master/SQL-cheat-sheet%20(sqltutorial.org).pdf)  
+
 
